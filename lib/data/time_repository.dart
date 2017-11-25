@@ -27,7 +27,7 @@ class TimeRepository {
   }
 
   /// Returns last duration today or null if missing
-  Future<Duration> getLastDurationToday() async {
+  Future<Duration> getDurationToday() async {
     return _getDuration(KEY_LAST_DURATION)
         .then((duration) {
         return _getLastDurationDate()
@@ -41,7 +41,7 @@ class TimeRepository {
     });
   }
 
-  Future<bool> setLastDurationToday(Duration duration) async {
+  Future<bool> setDurationToday(Duration duration) async {
     return _setDuration(KEY_LAST_DURATION, duration)
     .then((ignored) => _setLastDurationDate());
   }

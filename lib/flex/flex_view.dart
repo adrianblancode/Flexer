@@ -1,46 +1,36 @@
-import 'package:Flexer/flex/flex_model.dart';
+import 'package:Flexer/flex/contract.dart';
+import 'package:Flexer/flex/flex_presenter.dart';
 import 'package:Flexer/util/time_utils.dart';
 import 'package:flutter/material.dart';
 
 
 class FlexView extends StatefulWidget {
   @override
-  _MyHomePageState createState() => new _MyHomePageState();
+  _FlexViewState createState() => new _FlexViewState();
 }
 
-class _MyHomePageState extends State<FlexView> {
-  static const int TIME_DELTA = 15;
-  final FlexModelImpl _model = new FlexModelImpl();
+class _FlexViewState extends State<FlexView> implements FlexViewContract {
+  FlexPresenterContract _presenter;
 
   Duration _time;
   Duration _timeToday;
 
-  Duration _getTimeOrDefault(Duration time) {
-    return time != null ? time : new Duration();
+  _FlexViewState() {
+    _presenter = new FlexPresenterImpl(this);
   }
 
-  _addDuration() async {
-    return _addDurationInternal(new Duration(minutes: TIME_DELTA));
+  @override
+  void initState() {
+    super.initState();
+    _presenter.loadTime();
   }
 
-  _removeDuration() async {
-    return _addDurationInternal(new Duration(minutes: -TIME_DELTA));
-  }
-
-  _addDurationInternal(Duration duration) async {
-    Duration time = await _model.getTotalDuration();
-    time += duration;
-
-    Duration timeToday = await _model.getLastDuration();
-    timeToday += duration;
-
+  @override
+  void onTimesReceived(Duration totalTime, Duration todayTime) {
     setState(() {
-      _time = time;
-      _timeToday = timeToday;
+      _time = totalTime;
+      _timeToday = todayTime;
     });
-
-    await _model.setTotalDuration(time);
-    await _model.setLastDuration(timeToday);
   }
 
   List<Color> _getColorsFromTime() {
@@ -51,11 +41,12 @@ class _MyHomePageState extends State<FlexView> {
     if (_time == null) {
       return [baseColor, baseColor];
     }
+    
     double top = 1.0 + (_time.inMinutes + 10.0) / DURATION_GRADIENT_MIN;
     double bottom = 1.0 + _time.inMinutes / DURATION_GRADIENT_MIN;
 
-    top = top.clamp(0.0, 2.0);
-    bottom = bottom.clamp(0.0, 2.0);
+    top = top.clamp(0.0, 1.0);
+    bottom = bottom.clamp(0.0, 1.0);
 
     return [Color.lerp(secondaryColor, baseColor, top),
     Color.lerp(secondaryColor, baseColor, bottom)
@@ -80,7 +71,7 @@ class _MyHomePageState extends State<FlexView> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 new Text(
-                  TimeUtils.formatDuration(_getTimeOrDefault(_time)),
+                  TimeUtils.formatDuration(_time),
                   style: Theme
                       .of(context)
                       .textTheme
@@ -88,7 +79,7 @@ class _MyHomePageState extends State<FlexView> {
                       .copyWith(fontSize: 100.0),
                 ),
                 new Text(
-                  TimeUtils.formatDuration(_getTimeOrDefault(_timeToday), forcePrefix: true),
+                  TimeUtils.formatDuration(_timeToday, forcePrefix: true),
                   style: Theme
                       .of(context)
                       .textTheme
@@ -107,7 +98,7 @@ class _MyHomePageState extends State<FlexView> {
             alignment: Alignment.bottomRight,
             child: new Padding(
               padding: new EdgeInsets.only(bottom: 16.0, right: 8.0),
-              child: new AddRemoveFabs(_addDuration, _removeDuration),
+              child: new AddRemoveFabs(_presenter.onAddTimeClicked, _presenter.onRemoveTimeClicked),
             ),
           )
         ],

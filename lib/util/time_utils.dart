@@ -15,6 +15,11 @@ class TimeUtils {
   }
 
   static String formatDuration(Duration time, {bool forcePrefix: false}) {
+
+    if (time == null) {
+      return "00:00";
+    }
+
     NumberFormat _formatter = new NumberFormat('00');
 
     int hours = time.inHours.abs();
