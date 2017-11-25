@@ -16,7 +16,7 @@ class _MyHomePageState extends State<FlexView> {
   Duration _timeToday;
 
   Duration _getTimeOrDefault(Duration time) {
-    return time != null ? time : null;
+    return time != null ? time : new Duration();
   }
 
   _addDuration() async {
@@ -84,11 +84,11 @@ class _MyHomePageState extends State<FlexView> {
                   style: Theme
                       .of(context)
                       .textTheme
-                      .display4,
+                      .display3
+                      .copyWith(fontSize: 100.0),
                 ),
                 new Text(
-                  TimeUtils.formatDuration(
-                      _getTimeOrDefault(_timeToday), forcePrefix: true),
+                  "+00:15 ",
                   style: Theme
                       .of(context)
                       .textTheme
@@ -97,7 +97,7 @@ class _MyHomePageState extends State<FlexView> {
                       color: Theme
                           .of(context)
                           .textTheme
-                          .display4
+                          .display3
                           .color),
                 ),
               ],
