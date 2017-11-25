@@ -88,7 +88,7 @@ class _MyHomePageState extends State<FlexView> {
                       .copyWith(fontSize: 100.0),
                 ),
                 new Text(
-                  "+00:15 ",
+                  TimeUtils.formatDuration(_getTimeOrDefault(_timeToday), forcePrefix: true),
                   style: Theme
                       .of(context)
                       .textTheme
